@@ -577,21 +577,30 @@ async function startGateScan(){
   await video.play();
   gateScanActive = true;
   let locked = false;
+  let frameCount = 0;
 
   function tick(){
     if(!gateScanActive) return;
-    if(!locked && video.readyState === video.HAVE_ENOUGH_DATA){
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
-      if(code && code.data){
-        locked = true;
-        const ok = handleGateScanResult(code.data);
-        if(ok) return; // stream ya se detuvo dentro de handleGateScanResult
-        setTimeout(()=>{ locked = false; }, 1500);
+    try{
+      if(!locked && video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth > 0 && video.videoHeight > 0){
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
+        frameCount++;
+        if(frameCount % 20 === 0){
+          statusEl.textContent = `Buscando código… (cámara activa, ${frameCount} cuadros analizados)`;
+        }
+        if(code && code.data){
+          locked = true;
+          const ok = handleGateScanResult(code.data);
+          if(ok) return; // stream ya se detuvo dentro de handleGateScanResult
+          setTimeout(()=>{ locked = false; }, 1500);
+        }
       }
+    }catch(err){
+      console.warn('Error leyendo frame de la cámara:', err);
     }
     requestAnimationFrame(tick);
   }
