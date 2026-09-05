@@ -31,9 +31,9 @@
       "id": "Z-10862",
       "plate": "Z-10862",
       "name": "Radiopatrulla Z",
-      "seccion": "Centauro 1 / Centauro 3",
-      "cuadrante": "1A y 1B",
-      "asignado": "Subtte. Camila Hernández Seguel · Sgto. 1° Alexis Parra Ramírez",
+      "seccion": "Centauro 1",
+      "cuadrante": "Segun Plan Operativo",
+      "asignado": "Subtte. Camila Hernández Seguel",
       "model": "patrulla.glb"
     },
     {
@@ -41,7 +41,7 @@
       "plate": "Z-8671",
       "name": "Radiopatrulla Z",
       "seccion": "Centauro 5",
-      "cuadrante": "1A y 1B",
+      "cuadrante": "Segun Plan Operativo",
       "asignado": "Sgto. 1° Jonathan Castillo Rojas",
       "model": "patrulla.glb"
     },
@@ -50,7 +50,7 @@
       "plate": "Z-10868",
       "name": "Radiopatrulla Z",
       "seccion": "Centauro 6",
-      "cuadrante": "1A y 1B",
+      "cuadrante": "Segun Plan Operativo",
       "asignado": "Sgto. 2° Fernández León",
       "model": "patrulla.glb"
     },
@@ -59,7 +59,7 @@
       "plate": "Z-9368",
       "name": "Radiopatrulla Z",
       "seccion": "Centauro 8",
-      "cuadrante": "1A y 1B",
+      "cuadrante": "Segun Plan Operativo",
       "asignado": "Sgto. 2° Juan Fuentes Zapata",
       "model": "patrulla.glb"
     },
@@ -68,7 +68,7 @@
       "plate": "Z-9158",
       "name": "Radiopatrulla Z",
       "seccion": "Centauro 12",
-      "cuadrante": "1A y 1B",
+      "cuadrante": "Segun Plan Operativo",
       "asignado": "Cabo 1° Manuel Moreno Guerrero",
       "model": "patrulla.glb"
     },
@@ -77,7 +77,7 @@
       "plate": "Z-9483",
       "name": "Radiopatrulla Z",
       "seccion": "Centauro 15",
-      "cuadrante": "1A y 1B",
+      "cuadrante": "Segun Plan Operativo",
       "asignado": "Cabo 2° Francisco Pastén Carvajal",
       "model": "patrulla.glb"
     },
