@@ -468,7 +468,7 @@ function hideAllViews(){
   recordsView.style.display='none'; editView.style.display='none';
 }
 
-function openScan(v){
+function openScan(v, viaQrLink){
   currentVehicle = v;
   document.getElementById('modelView').setAttribute('src', v.model);
   document.getElementById('dvName').textContent = v.name;
@@ -481,15 +481,25 @@ function openScan(v){
   document.getElementById('fRecorrido').value = '—';
 
   stopGateScan();
-  document.getElementById('accessGate').style.display='block';
   document.getElementById('gateScanBox').style.display='none';
   document.getElementById('gateScanBox').classList.remove('active');
   document.getElementById('gateBtn').style.display='block';
   document.getElementById('gateVehName').textContent = v.name + ' — ' + v.plate;
-  document.getElementById('formPhase').style.display='none';
   document.getElementById('confirmBox').style.display='none';
   document.getElementById('regForm').style.display='block';
   document.getElementById('gateTime').textContent = new Date().toLocaleString('es-CL');
+
+  if(viaQrLink){
+    // Llegó a esta página a través del enlace que solo existe en el QR físico:
+    // eso YA es la prueba de acceso, no hace falta volver a escanear dentro de la página.
+    document.getElementById('accessGate').style.display='none';
+    document.getElementById('formPhase').style.display='block';
+  } else {
+    // Entró tocando la tarjeta desde el Panel: no hay prueba de que escaneó el QR real,
+    // así que se le exige escanearlo aquí antes de dejarlo avanzar.
+    document.getElementById('accessGate').style.display='block';
+    document.getElementById('formPhase').style.display='none';
+  }
 
   hideAllViews(); scanView.style.display='block';
   setActive(btnScan);
@@ -586,7 +596,13 @@ async function startGateScan(){
   statusEl.style.color = '';
 
   try{
-    gateStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    gateStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: 'environment',
+        width: { ideal: 1920 },
+        height: { ideal: 1080 }
+      }
+    });
   }catch(err){
     statusEl.textContent = 'No se pudo acceder a la cámara: ' + err.message;
     statusEl.style.color = 'var(--danger)';
@@ -607,11 +623,9 @@ async function startGateScan(){
     try{
       if(!locked){
         const code = decodeFrame(video, canvas, ctx);
-        if(code){
-          frameCount++;
-          if(frameCount % 20 === 0){
-            statusEl.textContent = `Buscando código… (cámara activa, ${frameCount} cuadros analizados)`;
-          }
+        frameCount++;
+        if(frameCount % 20 === 0){
+          statusEl.textContent = `Buscando código… (cámara activa, ${frameCount} cuadros analizados, sin detectar aún)`;
         }
         if(code && code.data){
           locked = true;
@@ -1054,7 +1068,7 @@ async function init(){
   const idParam = params.get('id') || params.get('vehiculo');
   if(idParam){
     const match = VEHICLES.find(v => v.id === idParam || v.id === decodeURIComponent(idParam));
-    if(match) openScan(match);
+    if(match) openScan(match, true);
   }
 }
 init();
