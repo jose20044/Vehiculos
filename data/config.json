@@ -58,27 +58,27 @@
       "id": "Z-9368",
       "plate": "Z-9368",
       "name": "Radiopatrulla Z",
-      "seccion": "Centauro 8",
+      "seccion": "Centauro 6",
       "cuadrante": "Segun Plan Operativo",
-      "asignado": "Sgto. 2° Juan Fuentes Zapata",
+      "asignado": "Sgto. 1° Jonathan Castillo Rojas",
       "model": "patrulla.glb"
     },
     {
       "id": "Z-9158",
       "plate": "Z-9158",
       "name": "Radiopatrulla Z",
-      "seccion": "Centauro 12",
+      "seccion": "Centauro 5",
       "cuadrante": "Segun Plan Operativo",
-      "asignado": "STGO 1° Hernan Campusano Albanez",
+      "asignado": "Sgto. 1° Hernan Campusano Albanez",
       "model": "patrulla.glb"
     },
     {
       "id": "Z-9483",
       "plate": "Z-9483",
       "name": "Radiopatrulla Z",
-      "seccion": "Centauro 15",
+      "seccion": "Centauro 8",
       "cuadrante": "Segun Plan Operativo",
-      "asignado": "Cabo 2° Francisco Pastén Carvajal",
+      "asignado": "Sgto 2° Víctor Astudillo Olate",
       "model": "patrulla.glb"
     },
     {
