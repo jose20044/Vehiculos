@@ -82,58 +82,22 @@
       "model": "patrulla.glb"
     },
     {
-      "id": "M-TT-6884",
-      "plate": "MTT 6884",
-      "name": "Moto Todo Terreno",
-      "seccion": "Centauro 7",
-      "cuadrante": "—",
-      "asignado": "Sgto. 2° Jorge Castillo Matus",
-      "model": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/ToyCar/glTF-Binary/ToyCar.glb"
-    },
-    {
-      "id": "M-TT-6885",
-      "plate": "MTT 6885",
-      "name": "Moto Todo Terreno",
-      "seccion": "Centauro 7",
-      "cuadrante": "—",
-      "asignado": "Cabo 1° Bárbara Zapata",
-      "model": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/ToyCar/glTF-Binary/ToyCar.glb"
-    },
-    {
-      "id": "TT-1402",
-      "plate": "TT1402",
-      "name": "Moto Tránsito",
-      "seccion": "Centauro 4",
-      "cuadrante": "—",
-      "asignado": "Sgto. 1° Cristian Albornoz Zamora",
-      "model": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/ToyCar/glTF-Binary/ToyCar.glb"
-    },
-    {
-      "id": "TT-1404",
-      "plate": "TT 1404",
-      "name": "Moto Tránsito",
-      "seccion": "Centauro 4",
-      "cuadrante": "—",
-      "asignado": "Cabo 1° Javier Herrera Figueroa",
-      "model": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/ToyCar/glTF-Binary/ToyCar.glb"
-    },
-    {
-      "id": "TT-1405",
-      "plate": "TT 1405",
-      "name": "Moto Tránsito",
-      "seccion": "Centauro 4",
-      "cuadrante": "—",
-      "asignado": "Carabinero Álvaro Ramírez Saa",
-      "model": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/ToyCar/glTF-Binary/ToyCar.glb"
-    },
-    {
       "id": "Z-10863",
       "plate": "Z-10863",
       "name": "Radiopatrulla Z",
       "seccion": "Centauro 3",
-      "cuadrante": "-",
+      "cuadrante": "Segun Plan Operativo",
       "asignado": "Sgto 1ro. Alexis Parra Ramirez",
       "model": "Patrulla.glb"
+    },
+    {
+      "id": "Z-9765",
+      "plate": "Z-9765",
+      "name": "Radiopatrulla Z",
+      "seccion": "Centauro 10",
+      "cuadrante": "Segun Plan Operativo",
+      "asignado": "Cabo 1°. Michel Moraga Leiva",
+      "model": "patrulla.glb"
     }
   ]
 }
