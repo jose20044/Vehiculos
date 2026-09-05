@@ -573,13 +573,40 @@ function handleGateScanResult(text){
   return false;
 }
 
-function decodeFrame(video, canvas, ctx){
+// Detector nativo del sistema (mismo motor que usa la cámara normal del celular).
+// Disponible en Chrome/Brave/Edge en Android. Si no existe (iPhone/Safari, Firefox),
+// se usa jsQR como respaldo.
+let nativeBarcodeDetector = null;
+if('BarcodeDetector' in window){
+  try{ nativeBarcodeDetector = new BarcodeDetector({ formats: ['qr_code'] }); }
+  catch(e){ nativeBarcodeDetector = null; }
+}
+
+function decodeFrameJsQR(video, canvas, ctx){
   if(video.readyState !== video.HAVE_ENOUGH_DATA || video.videoWidth === 0 || video.videoHeight === 0) return null;
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   return jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
+}
+
+// Intenta primero con el detector nativo (más confiable); si falla o no existe, usa jsQR.
+async function decodeFrame(video, canvas, ctx){
+  if(nativeBarcodeDetector){
+    try{
+      if(video.readyState < video.HAVE_ENOUGH_DATA || video.videoWidth === 0) return null;
+      const barcodes = await nativeBarcodeDetector.detect(video);
+      if(barcodes && barcodes.length){
+        return { data: barcodes[0].rawValue };
+      }
+      return null;
+    }catch(err){
+      console.warn('BarcodeDetector nativo falló, usando jsQR:', err);
+      nativeBarcodeDetector = null; // no insistir si falla, seguir con jsQR el resto de la sesión
+    }
+  }
+  return decodeFrameJsQR(video, canvas, ctx);
 }
 
 async function startGateScan(){
@@ -592,7 +619,9 @@ async function startGateScan(){
   box.style.display = 'flex';
   box.classList.add('active'); // pantalla completa, como un lector de QR normal
   document.getElementById('gateBtn').style.display = 'none';
-  statusEl.textContent = 'Apunta la cámara al QR pegado en el vehículo…';
+  statusEl.textContent = nativeBarcodeDetector
+    ? 'Apunta la cámara al QR pegado en el vehículo…'
+    : 'Apunta la cámara al QR (modo compatibilidad, sin lector nativo)…';
   statusEl.style.color = '';
 
   try{
@@ -616,26 +645,32 @@ async function startGateScan(){
   await video.play();
   gateScanActive = true;
   let locked = false;
+  let processing = false;
   let frameCount = 0;
 
-  function tick(){
+  async function tick(){
     if(!gateScanActive) return;
-    try{
-      if(!locked){
-        const code = decodeFrame(video, canvas, ctx);
+    if(!locked && !processing){
+      processing = true;
+      try{
+        const code = await decodeFrame(video, canvas, ctx);
         frameCount++;
-        if(frameCount % 20 === 0){
-          statusEl.textContent = `Buscando código… (cámara activa, ${frameCount} cuadros analizados, sin detectar aún)`;
+        if(frameCount % 15 === 0){
+          statusEl.textContent = `Buscando código… (${frameCount} intentos, sin detectar aún)`;
         }
         if(code && code.data){
           locked = true;
+          processing = false;
           const ok = handleGateScanResult(code.data);
           if(ok) return; // stream ya se detuvo dentro de handleGateScanResult
           setTimeout(()=>{ locked = false; }, 1500);
+          requestAnimationFrame(tick);
+          return;
         }
+      }catch(err){
+        console.warn('Error leyendo frame de la cámara:', err);
       }
-    }catch(err){
-      console.warn('Error leyendo frame de la cámara:', err);
+      processing = false;
     }
     requestAnimationFrame(tick);
   }
@@ -656,13 +691,13 @@ document.getElementById('gateCloseX').onclick = closeGateScan;
 
 // Captura manual: por si el auto-escaneo no detecta el código solo,
 // el usuario puede tocar el botón para forzar un intento de lectura.
-document.getElementById('gateCaptureBtn').onclick = ()=>{
+document.getElementById('gateCaptureBtn').onclick = async ()=>{
   const video = document.getElementById('gateVideo');
   const canvas = document.getElementById('gateCanvas');
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
   const statusEl = document.getElementById('gateScanStatus');
 
-  const code = decodeFrame(video, canvas, ctx);
+  const code = await decodeFrame(video, canvas, ctx);
   if(code && code.data){
     handleGateScanResult(code.data);
   } else {
