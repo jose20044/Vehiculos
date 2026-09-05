@@ -354,23 +354,12 @@ let PLAN = {
 };
 
 // ======================================================
-// CONFIGURACIÓN GITHUB — reemplaza estos 3 valores
+// CONFIGURACIÓN — URL del Worker de Cloudflare (proxy seguro)
+// El token de GitHub YA NO vive aquí: vive solo en Cloudflare.
 // ======================================================
-// 1. Crea un repositorio nuevo (puede ser privado) en github.com
-// 2. Ve a Settings > Developer settings > Fine-grained tokens > Generate new token
-//    - "Repository access": Only select repositories -> elige SOLO este repo
-//    - "Permissions" -> Contents: Read and write (nada más)
-// 3. Pega el owner, el nombre del repo y el token abajo.
-const GITHUB_OWNER  = 'jose20044';
-const GITHUB_REPO   = 'Vehiculos';
-const GITHUB_BRANCH = 'main';
-const GITHUB_TOKEN  = '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';
+const WORKER_URL = 'https://vehiculos.jose1997calvillan.workers.dev';
 // ======================================================
 
-const GH_API = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents`;
-function ghHeaders(){
-  return { 'Authorization': 'Bearer ' + GITHUB_TOKEN, 'Accept': 'application/vnd.github+json' };
-}
 function b64EncodeUnicode(str){
   return btoa(unescape(encodeURIComponent(str)));
 }
@@ -378,37 +367,26 @@ function b64DecodeUnicode(str){
   return decodeURIComponent(escape(atob(str)));
 }
 async function githubPutFile(path, obj, message){
-  const res = await fetch(`${GH_API}/${path}?ref=${GITHUB_BRANCH}`, {
-    method: 'PUT', headers: { ...ghHeaders(), 'Content-Type':'application/json' },
-    body: JSON.stringify({ message, content: b64EncodeUnicode(JSON.stringify(obj, null, 2)), branch: GITHUB_BRANCH })
-  });
-  if(!res.ok) throw new Error('GitHub PUT falló: ' + res.status + ' ' + await res.text());
-  return res.json();
+  return githubUpsertFile(path, obj, message);
 }
 async function githubGetFile(path){
-  const res = await fetch(`${GH_API}/${path}?ref=${GITHUB_BRANCH}`, { headers: ghHeaders() });
-  if(res.status === 404) return null;
-  if(!res.ok) throw new Error('GitHub GET falló: ' + res.status);
+  const res = await fetch(`${WORKER_URL}?action=get&path=${encodeURIComponent(path)}`);
+  if(!res.ok) throw new Error('Worker GET falló: ' + res.status);
   const data = await res.json();
+  if(!data || !data.content) return null;
   return { json: JSON.parse(b64DecodeUnicode(data.content)), sha: data.sha };
 }
 async function githubListDir(path){
-  const res = await fetch(`${GH_API}/${path}?ref=${GITHUB_BRANCH}`, { headers: ghHeaders() });
-  if(res.status === 404) return [];
-  if(!res.ok) throw new Error('GitHub LIST falló: ' + res.status);
+  const res = await fetch(`${WORKER_URL}?action=list&path=${encodeURIComponent(path)}`);
+  if(!res.ok) throw new Error('Worker LIST falló: ' + res.status);
   return res.json(); // array de {name, path, ...}
 }
 async function githubUpsertFile(path, obj, message){
-  // PUT necesita el sha si el archivo ya existe (para actualizarlo, no crear uno nuevo)
-  const existing = await githubGetFile(path).catch(()=>null);
-  const res = await fetch(`${GH_API}/${path}`, {
-    method: 'PUT', headers: { ...ghHeaders(), 'Content-Type':'application/json' },
-    body: JSON.stringify({
-      message, content: b64EncodeUnicode(JSON.stringify(obj, null, 2)), branch: GITHUB_BRANCH,
-      ...(existing && existing.sha ? { sha: existing.sha } : {})
-    })
+  const res = await fetch(`${WORKER_URL}?action=upsert&path=${encodeURIComponent(path)}`, {
+    method: 'PUT', headers: { 'Content-Type':'application/json' },
+    body: JSON.stringify({ message, content: b64EncodeUnicode(JSON.stringify(obj, null, 2)) })
   });
-  if(!res.ok) throw new Error('GitHub UPSERT falló: ' + res.status + ' ' + await res.text());
+  if(!res.ok) throw new Error('Worker UPSERT falló: ' + res.status + ' ' + await res.text());
   return res.json();
 }
 
