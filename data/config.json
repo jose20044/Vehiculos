@@ -1,0 +1,130 @@
+{
+  "plan": {
+    "numero": "130",
+    "seccion": "Centauro",
+    "cuando": "Miércoles 26.08.2026 · Segundo turno · Cuadrante 1A y 1B",
+    "stats": [
+      {
+        "value": "07",
+        "label": "Z"
+      },
+      {
+        "value": "02",
+        "label": "motos tránsito"
+      },
+      {
+        "value": "03",
+        "label": "motos t. terreno"
+      },
+      {
+        "value": "01",
+        "label": "PNS"
+      },
+      {
+        "value": "23",
+        "label": "PNI"
+      }
+    ]
+  },
+  "vehicles": [
+    {
+      "id": "Z-10862",
+      "plate": "Z-10862",
+      "name": "Radiopatrulla Z",
+      "seccion": "Centauro 1 / Centauro 3",
+      "cuadrante": "1A y 1B",
+      "asignado": "Subtte. Camila Hernández Seguel · Sgto. 1° Alexis Parra Ramírez",
+      "model": "patrulla.glb"
+    },
+    {
+      "id": "Z-8671",
+      "plate": "Z-8671",
+      "name": "Radiopatrulla Z",
+      "seccion": "Centauro 5",
+      "cuadrante": "1A y 1B",
+      "asignado": "Sgto. 1° Jonathan Castillo Rojas",
+      "model": "patrulla.glb"
+    },
+    {
+      "id": "Z-10868",
+      "plate": "Z-10868",
+      "name": "Radiopatrulla Z",
+      "seccion": "Centauro 6",
+      "cuadrante": "1A y 1B",
+      "asignado": "Sgto. 2° Fernández León",
+      "model": "patrulla.glb"
+    },
+    {
+      "id": "Z-9368",
+      "plate": "Z-9368",
+      "name": "Radiopatrulla Z",
+      "seccion": "Centauro 8",
+      "cuadrante": "1A y 1B",
+      "asignado": "Sgto. 2° Juan Fuentes Zapata",
+      "model": "patrulla.glb"
+    },
+    {
+      "id": "Z-9158",
+      "plate": "Z-9158",
+      "name": "Radiopatrulla Z",
+      "seccion": "Centauro 12",
+      "cuadrante": "1A y 1B",
+      "asignado": "Cabo 1° Manuel Moreno Guerrero",
+      "model": "patrulla.glb"
+    },
+    {
+      "id": "Z-9483",
+      "plate": "Z-9483",
+      "name": "Radiopatrulla Z",
+      "seccion": "Centauro 15",
+      "cuadrante": "1A y 1B",
+      "asignado": "Cabo 2° Francisco Pastén Carvajal",
+      "model": "patrulla.glb"
+    },
+    {
+      "id": "M-TT-6884",
+      "plate": "M TT 6884",
+      "name": "Moto Todo Terreno",
+      "seccion": "Centauro 7",
+      "cuadrante": "—",
+      "asignado": "Sgto. 2° Jorge Castillo Matus",
+      "model": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/ToyCar/glTF-Binary/ToyCar.glb"
+    },
+    {
+      "id": "M-TT-6885",
+      "plate": "M TT 6885",
+      "name": "Moto Todo Terreno",
+      "seccion": "Centauro 7",
+      "cuadrante": "—",
+      "asignado": "Cabo 1° Bárbara Zapata",
+      "model": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/ToyCar/glTF-Binary/ToyCar.glb"
+    },
+    {
+      "id": "TT-1402",
+      "plate": "TT 1402",
+      "name": "Moto Tránsito",
+      "seccion": "Centauro 4",
+      "cuadrante": "—",
+      "asignado": "Sgto. 1° Cristian Albornoz Zamora",
+      "model": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/ToyCar/glTF-Binary/ToyCar.glb"
+    },
+    {
+      "id": "TT-1404",
+      "plate": "TT 1404",
+      "name": "Moto Tránsito",
+      "seccion": "Centauro 4",
+      "cuadrante": "—",
+      "asignado": "Cabo 1° Javier Herrera Figueroa",
+      "model": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/ToyCar/glTF-Binary/ToyCar.glb"
+    },
+    {
+      "id": "TT-1405",
+      "plate": "TT 1405",
+      "name": "Moto Tránsito",
+      "seccion": "Centauro 4",
+      "cuadrante": "—",
+      "asignado": "Carabinero Álvaro Ramírez Saa",
+      "model": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/ToyCar/glTF-Binary/ToyCar.glb"
+    }
+  ]
+}
