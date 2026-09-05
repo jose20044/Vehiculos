@@ -7,6 +7,7 @@
 <title>Registro de Vehículos Policiales</title>
 <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
@@ -105,6 +106,13 @@
   .gate-time{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);margin-bottom:16px;}
   .gate-btn{background:var(--amber);color:#1a1200;border:none;border-radius:10px;padding:13px 22px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;cursor:pointer;width:100%;}
   .gate-caption{font-size:10.5px;color:var(--muted);margin-top:10px;line-height:1.5;}
+
+  #gateScanBox{display:none;}
+  .gate-video-frame{position:relative;border-radius:12px;overflow:hidden;background:#000;margin-bottom:12px;}
+  .gate-video-frame video{width:100%;display:block;max-height:280px;object-fit:cover;}
+  .gate-video-frame::after{content:'';position:absolute;inset:14%;border:2px solid var(--amber);border-radius:10px;pointer-events:none;opacity:.85;}
+  .gate-scan-status{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);line-height:1.5;margin-bottom:12px;min-height:32px;}
+  .gate-cancel-btn{background:var(--panel-2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:11px 20px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;cursor:pointer;width:100%;}
 
   #formPhase{display:none;}
   .section-label{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin:0 0 10px;}
@@ -228,10 +236,20 @@
     <!-- FASE 1: llave QR -->
     <div class="access-gate" id="accessGate">
       <div class="gate-icon">▦</div>
-      <div class="gate-title">Llave de acceso QR válida</div>
+      <div class="gate-title" id="gateTitle">Escanea la llave de acceso QR</div>
       <div class="gate-time" id="gateTime">—</div>
-      <button class="gate-btn" id="gateBtn">Comenzar registro</button>
-      <div class="gate-caption">En la versión final este paso se hace solo al escanear el QR físico: no hace falta tocar nada más para que quede con fecha y hora.</div>
+
+      <div id="gateScanBox">
+        <div class="gate-video-frame">
+          <video id="gateVideo" playsinline muted></video>
+        </div>
+        <canvas id="gateCanvas" style="display:none;"></canvas>
+        <div class="gate-scan-status" id="gateScanStatus">Apunta la cámara al QR pegado en el vehículo…</div>
+        <button type="button" class="gate-cancel-btn" id="gateCancelBtn">Cancelar</button>
+      </div>
+
+      <button class="gate-btn" id="gateBtn">Escanear QR</button>
+      <div class="gate-caption">Debes escanear el QR físico pegado en <b id="gateVehName">este vehículo</b> para poder llenar la hoja de ruta. No se puede avanzar sin escanearlo.</div>
     </div>
 
     <!-- FASE 2: formulario -->
@@ -436,6 +454,7 @@ function setActive(btn){
   btn.classList.add('active');
 }
 function hideAllViews(){
+  if(scanView.style.display === 'block') stopGateScan();
   adminView.style.display='none'; scanView.style.display='none';
   recordsView.style.display='none'; editView.style.display='none';
 }
@@ -452,7 +471,11 @@ function openScan(v){
   document.getElementById('fTurno').value = 'Segundo turno';
   document.getElementById('fRecorrido').value = '—';
 
+  stopGateScan();
   document.getElementById('accessGate').style.display='block';
+  document.getElementById('gateScanBox').style.display='none';
+  document.getElementById('gateBtn').style.display='block';
+  document.getElementById('gateVehName').textContent = v.name + ' — ' + v.plate;
   document.getElementById('formPhase').style.display='none';
   document.getElementById('confirmBox').style.display='none';
   document.getElementById('regForm').style.display='block';
@@ -483,10 +506,103 @@ btnRecords.onclick = openRecords;
 btnEdit.onclick = openEdit;
 document.getElementById('btnBack').onclick = openAdmin;
 
-document.getElementById('gateBtn').onclick = ()=>{
-  document.getElementById('accessGate').style.display='none';
-  document.getElementById('formPhase').style.display='block';
-  document.getElementById('fKmInicial').focus();
+// ---- Escaneo real de la llave QR (cámara del dispositivo) ----
+let gateStream = null;
+let gateScanActive = false;
+
+function stopGateScan(){
+  gateScanActive = false;
+  if(gateStream){
+    gateStream.getTracks().forEach(t=>t.stop());
+    gateStream = null;
+  }
+}
+
+function extractIdFromQR(text){
+  try{
+    const url = new URL(text);
+    return url.searchParams.get('id') || url.searchParams.get('vehiculo');
+  }catch(e){
+    return text.trim(); // por si el QR trae solo el código, sin URL
+  }
+}
+
+function handleGateScanResult(text){
+  const statusEl = document.getElementById('gateScanStatus');
+  const scannedId = extractIdFromQR(text);
+
+  if(currentVehicle && scannedId === currentVehicle.id){
+    stopGateScan();
+    statusEl.textContent = '✓ QR válido — abriendo registro…';
+    statusEl.style.color = 'var(--ok)';
+    setTimeout(()=>{
+      document.getElementById('gateScanBox').style.display = 'none';
+      document.getElementById('gateBtn').style.display = 'block';
+      document.getElementById('accessGate').style.display='none';
+      document.getElementById('formPhase').style.display='block';
+      document.getElementById('fKmInicial').focus();
+    }, 500);
+    return true;
+  }
+
+  statusEl.textContent = scannedId
+    ? `Ese QR corresponde a otro vehículo (${scannedId}). Escanea el de ${currentVehicle.plate}.`
+    : 'Código no reconocido. Intenta de nuevo.';
+  statusEl.style.color = 'var(--danger)';
+  return false;
+}
+
+async function startGateScan(){
+  const video = document.getElementById('gateVideo');
+  const canvas = document.getElementById('gateCanvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  const statusEl = document.getElementById('gateScanStatus');
+
+  document.getElementById('gateScanBox').style.display = 'block';
+  document.getElementById('gateBtn').style.display = 'none';
+  statusEl.textContent = 'Apunta la cámara al QR pegado en el vehículo…';
+  statusEl.style.color = '';
+
+  try{
+    gateStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+  }catch(err){
+    statusEl.textContent = 'No se pudo acceder a la cámara: ' + err.message;
+    statusEl.style.color = 'var(--danger)';
+    document.getElementById('gateScanBox').style.display = 'none';
+    document.getElementById('gateBtn').style.display = 'block';
+    return;
+  }
+
+  video.srcObject = gateStream;
+  await video.play();
+  gateScanActive = true;
+  let locked = false;
+
+  function tick(){
+    if(!gateScanActive) return;
+    if(!locked && video.readyState === video.HAVE_ENOUGH_DATA){
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
+      if(code && code.data){
+        locked = true;
+        const ok = handleGateScanResult(code.data);
+        if(ok) return; // stream ya se detuvo dentro de handleGateScanResult
+        setTimeout(()=>{ locked = false; }, 1500);
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+document.getElementById('gateBtn').onclick = startGateScan;
+document.getElementById('gateCancelBtn').onclick = ()=>{
+  stopGateScan();
+  document.getElementById('gateScanBox').style.display = 'none';
+  document.getElementById('gateBtn').style.display = 'block';
 };
 
 // ---- KM / recorrido ----
