@@ -125,6 +125,15 @@
       "cuadrante": "—",
       "asignado": "Carabinero Álvaro Ramírez Saa",
       "model": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/ToyCar/glTF-Binary/ToyCar.glb"
+    },
+    {
+      "id": "Z-10863",
+      "plate": "Z-10863",
+      "name": "Radiopatrulla Z",
+      "seccion": "Centauro 3",
+      "cuadrante": "-",
+      "asignado": "Sgto 1ro. Alexis Parra Ramirez",
+      "model": "Patrulla.glb"
     }
   ]
 }
