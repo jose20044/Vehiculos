@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Registro de Vehículos Policiales</title>
 <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -14,29 +13,36 @@
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
 
   :root{
-    --bg:#0e1216; --panel:#161b21; --panel-2:#1d232b; --line:#2a323c;
-    --amber:#e2a33b; --cyan:#4fb8d1; --text:#e8ecf1; --muted:#7d8894; --danger:#e0605f; --ok:#5fbf8f;
+    --bg:#f2f6f3; --panel:#ffffff; --panel-2:#eef4f0; --line:#dbe6e0;
+    --amber:#0e6b3a; --cyan:#1f9e5e; --text:#173023; --muted:#5c6e64; --danger:#c0392b; --ok:#1f9e5e;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    background:
-      linear-gradient(var(--line) 1px, transparent 1px) 0 0/40px 40px,
-      linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0/40px 40px,
-      var(--bg);
-    background-attachment:fixed; color:var(--text); font-family:'Inter',sans-serif;
+    background:var(--bg);
+    color:var(--text); font-family:'Inter',sans-serif;
     min-height:100vh; -webkit-font-smoothing:antialiased;
   }
   .wrap{max-width:520px;margin:0 auto;padding:20px 16px 60px;}
 
+  /* Sombra suave institucional para todo lo que usa fondo blanco de panel */
+  .plan-strip,.vcard,.assign-box,.oil-box,.check-item,.rec-item,.edit-vcard,.access-gate,
+  .field input,.field select,.field textarea,.mode-toggle,.viewer-frame{
+    box-shadow:0 1px 4px rgba(23,48,35,.07);
+  }
+
   header{display:flex;align-items:center;justify-content:space-between;padding:6px 2px 18px;flex-wrap:wrap;gap:10px;}
   .brand{display:flex;align-items:center;gap:10px;}
-  .brand-mark{width:34px;height:34px;border:2px solid var(--amber);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--amber);font-size:13px;}
+  .brand-mark{width:34px;height:34px;border:2px solid var(--amber);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--amber);}
+  .brand-mark svg{width:19px;height:19px;}
   .brand-text{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;}
   .brand-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px;}
   .mode-toggle{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;font-family:'IBM Plex Mono',monospace;font-size:10.5px;}
   .mode-toggle button{background:none;border:none;color:var(--muted);padding:8px 9px;cursor:pointer;}
-  .mode-toggle button.active{background:var(--amber);color:#1a1200;font-weight:600;}
+  .mode-toggle button.active{background:var(--amber);color:#ffffff;font-weight:600;}
+
+  .header-right{display:flex;align-items:center;gap:10px;}
+  .centauro-logo{width:38px;height:38px;border-radius:50%;object-fit:cover;border:1px solid var(--line);flex-shrink:0;}
 
   .shared-note{background:rgba(79,184,209,.08);border:1px solid rgba(79,184,209,.35);color:var(--cyan);font-size:11.5px;line-height:1.5;padding:9px 12px;border-radius:9px;margin-bottom:18px;font-family:'IBM Plex Mono',monospace;}
 
@@ -61,10 +67,10 @@
   .vcard .assigned{font-size:10.5px;color:var(--muted);line-height:1.4;margin-top:5px;}
   .vcard .status{position:absolute;top:10px;right:10px;width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);}
 
-  .qr-note{margin-top:22px;background:var(--panel);border:1px dashed var(--line);border-radius:12px;padding:16px;display:flex;gap:14px;align-items:center;}
-  #qrcanvas{background:#fff;padding:6px;border-radius:6px;flex-shrink:0;}
-  .qr-note .txt{font-size:12.5px;color:var(--muted);line-height:1.5;}
-  .qr-note .txt b{color:var(--text);}
+  .soon-btn{width:100%;margin-top:16px;background:var(--panel-2);border:1px dashed var(--line);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:not-allowed;font-family:'Inter',sans-serif;text-align:left;}
+  .soon-icon{width:22px;height:22px;color:var(--muted);flex-shrink:0;}
+  .soon-btn span:not(.soon-tag){font-size:14px;font-weight:600;color:var(--text);flex:1;}
+  .soon-tag{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--muted);background:var(--panel);border:1px solid var(--line);padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;}
 
   #scanView{display:none;}
   .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11.5px;background:none;border:none;cursor:pointer;padding:0 0 16px;}
@@ -72,7 +78,7 @@
   .scan-flag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:pulse 1.4s infinite;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
 
-  .viewer-frame{position:relative;border-radius:16px;background:radial-gradient(circle at 50% 30%, #202834, #10151c);border:1px solid var(--line);overflow:hidden;height:250px;}
+  .viewer-frame{position:relative;border-radius:16px;background:radial-gradient(circle at 50% 30%, #eef4f0, #dfeae2);border:1px solid var(--line);overflow:hidden;height:250px;}
   .viewer-frame .corner{position:absolute;width:18px;height:18px;border:2px solid var(--amber);opacity:.8;}
   .viewer-frame .c-tl{top:10px;left:10px;border-right:none;border-bottom:none;}
   .viewer-frame .c-tr{top:10px;right:10px;border-left:none;border-bottom:none;}
@@ -101,10 +107,11 @@
 
   /* access gate */
   .access-gate{background:var(--panel);border:1px solid var(--amber);border-radius:14px;padding:22px 18px;text-align:center;margin-bottom:18px;}
-  .gate-icon{font-size:30px;color:var(--amber);margin-bottom:8px;}
+  .gate-icon{color:var(--amber);margin-bottom:8px;display:flex;justify-content:center;}
+  .gate-icon svg{width:30px;height:30px;}
   .gate-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15.5px;margin-bottom:4px;}
   .gate-time{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);margin-bottom:16px;}
-  .gate-btn{background:var(--amber);color:#1a1200;border:none;border-radius:10px;padding:13px 22px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;cursor:pointer;width:100%;}
+  .gate-btn{background:linear-gradient(135deg, var(--amber), var(--cyan));color:#ffffff;border:none;border-radius:10px;padding:13px 22px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;cursor:pointer;width:100%;}
   .gate-caption{font-size:10.5px;color:var(--muted);margin-top:10px;line-height:1.5;}
 
   #gateScanBox{display:none;}
@@ -138,7 +145,7 @@
   .check-item.oil{border-color:rgba(226,163,59,.4);}
   .check-item.oil input{accent-color:var(--amber);}
 
-  .submit-btn{width:100%;background:var(--amber);color:#1a1200;border:none;border-radius:10px;padding:15px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;cursor:pointer;}
+  .submit-btn{width:100%;background:linear-gradient(135deg, var(--amber), var(--cyan));color:#ffffff;border:none;border-radius:10px;padding:15px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;cursor:pointer;}
   .submit-btn:active{transform:scale(.98);}
   .submit-btn[disabled]{opacity:.6;}
 
@@ -179,17 +186,22 @@
 
   <header>
     <div class="brand">
-      <div class="brand-mark">◈</div>
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 9 4.6-.3 8-4 8-9V5l-8-3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
       <div>
         <div class="brand-text">Registro Vehicular</div>
         <div class="brand-sub">Carabineros · Control por QR</div>
       </div>
     </div>
-    <div class="mode-toggle">
-      <button id="btnAdmin" class="active">Panel</button>
-      <button id="btnScan">Escanear</button>
-      <button id="btnRecords">Registros</button>
-      <button id="btnEdit">Editar</button>
+    <div class="header-right">
+      <img src="centauro-logo.png" alt="Radiopatrullas Centauro" class="centauro-logo">
+      <div class="mode-toggle">
+        <button id="btnAdmin" class="active">Panel</button>
+        <button id="btnScan">Escanear</button>
+        <button id="btnRecords">Registros</button>
+        <button id="btnEdit">Editar</button>
+      </div>
     </div>
   </header>
 
@@ -206,10 +218,11 @@
 
     <div class="vehicle-grid" id="vehicleGrid"></div>
 
-    <div class="qr-note">
-      <canvas id="qrcanvas"></canvas>
-      <div class="txt"><b>Así se ve el QR real.</b> Va pegado en el vehículo. Escanearlo es la llave que habilita el registro de ese día y esa hora — nadie llena datos sin pasar por ahí.</div>
-    </div>
+    <button type="button" class="soon-btn" disabled>
+      <svg class="soon-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 2v3M16 2v3M3.5 8.5h17M5 4.5h14a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 20V6A1.5 1.5 0 0 1 5 4.5Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M7.5 13h3M7.5 16.5h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span>Hoja del turno</span>
+      <span class="soon-tag">Próximamente</span>
+    </button>
   </div>
 
   <!-- SCAN / REGISTRO -->
@@ -242,7 +255,9 @@
 
     <!-- FASE 1: llave QR -->
     <div class="access-gate" id="accessGate">
-      <div class="gate-icon">▦</div>
+      <div class="gate-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="7" height="7" rx="1.3" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.3" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.3" stroke="currentColor" stroke-width="1.6"/><path d="M14 14h3v3h-3zM20 14v3M14 20h3M20 20v.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
       <div class="gate-title" id="gateTitle">Escanea la llave de acceso QR</div>
       <div class="gate-time" id="gateTime">—</div>
 
@@ -440,11 +455,6 @@ function renderPlanStrip(){
   document.getElementById('planWhen').textContent = PLAN.cuando;
   document.getElementById('planStats').innerHTML = PLAN.stats.map(s=>`<div><b>${s.value}</b> ${s.label}</div>`).join('');
 }
-
-new QRCode(document.getElementById('qrcanvas'), {
-  text: 'https://registro.carabineros.local/vehiculo/Z-10862',
-  width:74, height:74, colorDark:'#0e1216', colorLight:'#ffffff'
-});
 
 const adminView = document.getElementById('adminView');
 const scanView = document.getElementById('scanView');
