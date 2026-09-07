@@ -525,7 +525,19 @@ async function openRecords(){
   setActive(btnRecords);
   await loadRecords();
 }
+const EDIT_PASSWORD = 'centauro2026';
+let editUnlocked = false;
+
 function openEdit(){
+  if(!editUnlocked){
+    const pass = prompt('Esta sección requiere clave de acceso:');
+    if(pass === null) return; // canceló, no navega
+    if(pass !== EDIT_PASSWORD){
+      alert('Clave incorrecta.');
+      return;
+    }
+    editUnlocked = true;
+  }
   hideAllViews(); editView.style.display='block';
   setActive(btnEdit);
   renderEditForm();
